@@ -1,0 +1,501 @@
+1)
+You can perform these SQL operations on the "employee" table as described:
+
+Create the "em" table:
+CREATE TABLE emp(
+    emp_id INT PRIMARY KEY,
+    e_name VARCHAR(50),
+    salary number(20),
+    Dept_no INT,
+    Designation VARCHAR(50)
+);
+Insert 10 records into the "employee" table:
+
+INSERT INTO emp(emp_id, e_name, salary, Dept_no, Designation)
+VALUES(1, 'John Doe', 50000, 101, 'Manager'),
+    (2, 'Jane Smith', 45000, '2023-02-20', 102, 'Supervisor'),
+    (3, 'Bob Johnson', 42000, '2023-03-10', 101, 'Clerk'),
+    (10, 'Sara Brown', 38000, '2023-04-05', 102, 'Technician');
+Create a view "emp_vl" of the "employee" table with "emp_id," "e_name," and "Dept_no" attributes:
+
+CREATE VIEW emp_vl AS
+SELECT emp_id, e_name, Dept_no
+FROM emp;
+To create a view of a table, you can use the CREATE VIEW statement as shown in step 3.
+
+You cannot directly update a view if it's based on multiple tables or contains aggregated data. If the view is updatable (based on a single table), you can update it just like a regular table. In this case, since "emp_vl" is a simple view of "employee," you can update it like this:
+UPDATE emp_vl
+SET Dept_no = 105
+WHERE emp_id = 1;
+
+This will update the "Dept_no" for the employee with "emp_id" 1 in the "employee" table as well.
+
+Create "emp_id" as the primary key:
+ALTER TABLE emp
+ADD PRIMARY KEY (emp_id);
+o show indices on a table, you can use the following SQL statement:
+SHOW INDEXES FROM emp;
+Create a user-defined index on any column. For example, you can create a non-clustered index on the "e_name" column:
+CREATE INDEX idx_e_name ON emp (e_name);
+This will create an index on the "e_name" column, which can improve query performance when searching for employee names.
+
+
+2)
+You can perform these basic SQL operations on the "employee" table as described:
+
+Display employees whose name contains the letter 'e':
+
+SELECT * 
+FROM emp
+WHERE e_name LIKE '%e%';
+Display different types of designations:
+
+SELECT DISTINCT Designation
+FROM emp;
+Display the name and salary of employees whose location is Mumbai (assuming "location" is not a column in the table, and you meant the "Dept_no" column):
+
+SELECT e_name, salary
+FROM emp
+WHERE Dept_no =101 ;
+Display the name and department of employees working in the Manager or Marketing department:
+
+SELECT e_name, Dept_no
+FROM emp
+WHERE Designation IN ('Manager', 'Marketing');
+Display the department names with more than one employee:
+
+SELECT Dept_no
+FROM emp
+GROUP BY Dept_no
+HAVING COUNT(*) > 1;
+Rename the "emp" table as "emp1":
+
+ALTER TABLE emp RENAME TO emp1;
+Add a new column "city" to the "employee" table:
+
+ALTER TABLE emp1
+ADD city VARCHAR(50);
+This adds a new column named "city" with a data type of VARCHAR(50) to the "emp1" table. You can then update the "city" values for each employee as needed.
+
+
+3)
+You can perform these basic SQL operations on the "emp" table with the given schema. I'll provide you with SQL queries for each of these tasks:
+
+Find the department in which the maximum employees work:
+
+SELECT Dept_no, COUNT(*) AS EmployeeCount FROM emp  GROUP BY Dept_no ORDER  BY EmployeeCount DESC LIMIT 1;
+Display the name, designation, and department number of employees whose names start with either 'A' or 'P':
+
+SELECT e_name, Designation, Dept_no
+FROM emp
+WHERE e_name LIKE 'A%' OR e_name LIKE 'P%';
+Display the maximum salary from department 2 and the minimum salary from department 4:
+
+SELECT MAX(salary) AS MaxSalaryDept2, MIN(salary) AS MinSalaryDept4
+FROM emp
+WHERE Dept_no = 102 OR Dept_no = 104;
+Display employee data where the salary is less than the average salary from department 3:
+
+SELECT *
+FROM emp
+WHERE salary < (SELECT AVG(salary) FROM emp WHERE Dept_no = 103);
+Display employees who were hired earliest or latest:
+
+SELECT *
+FROM emp
+WHERE Date_of_Joining = (SELECT MIN(Date_of_Joining) FROM emp) OR Date_of_Joining = (SELECT MAX(Date_of_Joining) FROM emp);
+Display the name and department number of employees who are managers or market analysts. Use predicates:
+
+SELECT e_name, Dept_no
+FROM emp
+WHERE Designation IN ('Manager', 'Market Analyst');
+List employees hired in August:
+
+SELECT *
+FROM emp
+WHERE MONTH(Date_of_Joining) = 8;
+List employees who were hired after December 31, 2006:
+
+SELECT *
+FROM emp
+WHERE Date_of_Joining > '2006-12-31';
+Find the average annual salary per department:
+
+SELECT Dept_no, AVG(salary) AS AverageSalary
+FROM emp
+GROUP BY Dept_no;
+These SQL queries should help you perform the requested operations on the "employee" table. Make sure to adjust the table and column names as per your actual database schema.
+
+
+4)
+I'll provide you with SQL commands to perform each of the tasks you've mentioned. Please note that the SQL syntax and database system you're using may vary, so make sure to adjust these commands accordingly. In this example, I'll assume you're using a database system that supports standard SQL syntax.
+
+Create both tables with primary key and foreign key constraints:
+
+CREATE TABLE Customer (
+    c_id INT PRIMARY KEY,
+    c_name VARCHAR(255),
+    email VARCHAR(255),
+    city VARCHAR(255),
+    pincode VARCHAR(10)
+);
+
+CREATE TABLE Order2(
+    order_id INT PRIMARY KEY,
+    amount DECIMAL(10, 2),
+    cust_id INT,
+    FOREIGN KEY (cust_id) REFERENCES Customer(c_id)
+);
+Insert 10 records into each table:
+
+-- Inserting 10 records into the Customer table
+INSERT INTO Customer (c_id, c_name, email, city, pincode)
+VALUES
+    (1, 'John Doe', 'john@example.com', 'New York', '10001'),
+    (2, 'Jane Smith', 'jane@example.com', 'Los Angeles', '90001'),
+    -- Add more records as needed.
+
+-- Inserting 10 records into the Order table
+INSERT INTO Order2(order_id, amount, cust_id)
+VALUES
+    (1, 100.00, 1),
+    (2,  75.50, 2),
+    -- Add more records as needed.
+Find all orders placed by customers with cust_id 2:
+
+SELECT * FROM Order2 WHERE cust_id = 2;
+Find the list of customers who placed their orders and details of their orders:
+
+SELECT c.c_name, o.order_id, o.amount
+FROM Customer c
+INNER JOIN Order2 o ON c.c_id = o.cust_id;
+List of customers who haven't placed an order:
+
+SELECT c.c_name
+FROM Customer c
+LEFT JOIN Order2 o ON c.c_id = o.cust_id
+WHERE o.cust_id IS NULL;
+List all orders and append them to the customer table:
+You can't directly append the orders to the Customer table because they are separate entities. However, you can retrieve a list of all customers and their orders in a single query as shown in task 4.
+
+Display all records:
+To display all records from both tables, you can run two separate queries:
+
+
+-- Display all records from the Customer table
+SELECT * FROM Customer;
+
+-- Display all records from the Order table
+SELECT * FROM Order;
+Display customers that are from the same city:
+To display customers from the same city, you can use a self-join on the Customer table. For example, to find customers from the same city as customer 2 (Jane Smith):
+
+
+SELECT c2.c_name
+FROM Customer c1
+INNER JOIN Customer c2 ON c1.city = c2.city
+WHERE c1.c_id = 2;
+This query will return a list of customers who are from the same city as Jane Smith. Adjust the c1.c_id value to check for other customers.
+
+5)
+To accomplish the tasks you've described, you can use SQL commands. Here's a step-by-step guide:
+
+Create both tables with primary keys:
+
+CREATE TABLE Borrower (
+    RollNo INT PRIMARY KEY,
+    Name VARCHAR(50),
+    DateofIssue DATE,
+    NameofBook VARCHAR(100),
+    Status VARCHAR(10)
+);
+
+CREATE TABLE Fine (
+    Roll_no INT PRIMARY KEY,
+    Date DATE,
+    Amt DECIMAL(10, 2)
+);
+Insert 10 records into each table:
+Here are sample records for both tables. You can modify the values as needed.
+
+For the Borrower table:
+
+
+INSERT INTO Borrower (RollNo, Name, DateofIssue, NameofBook, Status) VALUES
+(1, 'John Doe', '2023-01-05', 'Book A', 'Issued'),
+(2, 'Jane Smith', '2023-01-10', 'Book B', 'Issued'),
+(3, 'Bob Johnson', '2023-02-15', 'Book C', 'Returned'),
+(4, 'Alice Brown', '2023-03-20', 'Book D', 'Issued'),
+(5, 'Ella Wilson', '2023-04-25', 'Book E', 'Returned'),
+(6, 'Mike Davis', '2023-05-30', 'Book F', 'Issued'),
+(7, 'Lisa Taylor', '2023-06-10', 'Book G', 'Issued'),
+(8, 'Mark White', '2023-07-15', 'Book H', 'Returned'),
+(9, 'Sarah Clark', '2023-08-20', 'Book I', 'Issued'),
+(10, 'David Anderson', '2023-09-25', 'Book J', 'Returned');
+For the Fine table, you can insert random data based on your requirements.
+
+Find the count of books with "Issued" status:
+
+SELECT COUNT(*) FROM Borrower WHERE Status = 'Issued';
+Display all records from both tables:
+To display all records, you can simply run a SELECT query on each table:
+
+For the Borrower table:
+
+
+SELECT * FROM Borrower;
+For the Fine table:
+
+
+SELECT * FROM Fine;
+Display RollNo whose date of issue is the same:
+
+SELECT RollNo
+FROM Borrower
+GROUP BY DateofIssue
+HAVING COUNT(*) > 1;
+This query will return the RollNo values for records where the date of issue is the same for multiple borrowers.
+
+
+
+
+
+
+
+6)
+Certainly! I'll provide you with three Data Definition Language (DDL) operations and three Data Manipulation Language (DML) operations for a table named "student" with columns "roll_no," "name," "marks," and "class," where "roll_no" is the primary key.
+
+Data Definition Language (DDL) Operations:
+
+Create the "student" table:
+
+CREATE TABLE student (
+    roll_no INT PRIMARY KEY,
+    name VARCHAR(255),
+    marks INT,
+    class VARCHAR(50)
+);
+Add a new column "grade" to the "student" table:
+
+ALTER TABLE student
+ADD grade CHAR(1);
+Remove the "marks" column from the "student" table:
+
+ALTER TABLE student
+DROP COLUMN marks;
+Data Manipulation Language (DML) Operations:
+
+Insert a new student record into the "student" table:
+
+INSERT INTO student (roll_no, name, marks, class)
+VALUES (1, 'John Doe', 95, 'Grade 10');
+Update the marks for a specific student:
+
+UPDATE student
+SET marks = 88
+WHERE roll_no = 1;
+Delete a student record from the "student" table:
+
+DELETE FROM student
+WHERE roll_no = 1;
+These SQL statements demonstrate various DDL and DML operations you can perform on the "student" table, including creating and altering the table structure and inserting, updating, and deleting data. Make sure to adapt these operations to your specific database system and requirements.
+
+7)
+You can create the "job_history" table with the specified columns and enforce constraints on the "employee_id" column to prevent duplicate values and on the "job_id" column to ensure it contains only values that exist in the "jobs" table. Here's the SQL statement to create the "job_history" table:
+
+create table jobs(
+    job_id int primary key,
+   job_rollno int
+   );
+
+CREATE TABLE job_history1(
+    employee_id INT primary key,
+    start_date DATE,
+    end_date DATE,
+    job_id int,
+    department_id INT,
+FOREIGN KEY (job_id) REFERENCES jobs(job_id)
+    );
+In this SQL statement:
+
+The "employee_id" column is part of the primary key, which ensures that each employee can have only one job history entry for a specific start date, preventing duplicate values.
+The "job_id" column is defined as a foreign key referencing the "jobs" table, which means it will only allow values that exist in the "jobs" table's "job_id" column.
+Make sure you have the "jobs" table already created with the appropriate structure (columns: job_id, job_title, min_sal, max_sal) for the foreign key constraint to work correctly.
+8)
+CREATE TABLE works (
+    employee_name VARCHAR(255),
+    company_name VARCHAR(255),
+    salary DECIMAL(10, 2),
+    PRIMARY KEY (employee_name, company_name),
+    FOREIGN KEY (employee_name) REFERENCES employee(employee_name),
+    FOREIGN KEY (company_name) REFERENCES company(company_name)
+);
+CREATE TABLE company (
+    company_name VARCHAR(255) PRIMARY KEY,
+    city VARCHAR(255)
+);
+CREATE TABLE manages (
+    employee_name VARCHAR(255),
+    manager_name VARCHAR(255),
+    PRIMARY KEY (employee_name),
+    FOREIGN KEY (employee_name) REFERENCES employee(employee_name),
+    FOREIGN KEY (manager_name) REFERENCES employee(employee_name)
+);
+
+a) To find the names, street address, and cities of residence for all employees who work for the same company and earn more than $10,000, you can use a SQL query like this:
+
+
+SELECT e.employee_name, e.street, e.city
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+WHERE w.salary > 10000
+AND (w.employee_name, w.company_name) IN (
+    SELECT employee_name, company_name
+    FROM works
+    GROUP BY employee_name, company_name
+    HAVING COUNT(*) > 1
+);
+This query first joins the employee and works tables using the employee name, filters for employees with a salary greater than $10,000, and then checks if there is more than one record for the same employee at the same company, indicating they work for the same company. It retrieves the name, street address, and city of such employees.
+
+b) To find the names of all employees who live in the same cities as the companies for which they work, you can use the following SQL query:
+
+
+SELECT e.employee_name
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+JOIN company c ON w.company_name = c.company_name
+WHERE e.city = c.city;
+This query joins the employee, works, and company tables and filters for employees whose city of residence matches the city of the company they work for, and it retrieves their names.
+
+c) To find the names of all employees who earn more than the average salary of all employees of their company, you can use the following SQL query:
+
+
+SELECT e.employee_name
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+WHERE w.salary > (
+    SELECT AVG(w2.salary)
+    FROM works w2
+    WHERE w2.company_name = w.company_name
+);
+This query joins the employee and works tables, and for each employee, it compares their salary to the average salary of all employees in the same company. If their salary is greater than the average, their name is retrieved.
+ 9)
+a) To find the name of the company that has the smallest payroll, you can use the following SQL query:
+
+
+SELECT w.company_name
+FROM works w
+GROUP BY w.company_name
+HAVING SUM(w.salary) = (
+    SELECT MIN(total_salary)
+    FROM (
+        SELECT company_name, SUM(salary) as total_salary
+        FROM works
+        GROUP BY company_name
+    ) min_salaries
+);
+This query first calculates the total payroll for each company using the SUM function and groups the results by company-name. Then, it compares the total payroll of each company to the minimum total payroll using a subquery to find the company with the smallest payroll.
+
+b) To find the names of all employees in the database who live in the same cities and on the same streets as their managers, you can use the following SQL query:
+
+
+SELECT e.employee_name
+FROM employee e
+JOIN manages m ON e.employee_name = m.employee_name
+WHERE e.street = (
+    SELECT street
+    FROM employee
+    WHERE employee_name = m.manager_name
+) AND e.city = (
+    SELECT city
+    FROM employee
+    WHERE employee_name = m.manager_name
+);
+This query joins the employee and manages tables to find employees whose street and city match those of their managers, and it retrieves their names.
+
+
+24)
+
+a. To create emp_id as the primary key and add indices on the employee table, you can use SQL commands like this:
+
+
+-- Create the 'employee' table
+CREATE TABLE employee (
+    emp_id INT PRIMARY KEY,
+    e_name VARCHAR(255),
+    salary DECIMAL(10, 2),
+    Date_of_Joining DATE,
+    Dept_no INT,
+    Designation VARCHAR(255)
+);
+
+-- Create the 'customer' table
+CREATE TABLE customer (
+    c_id INT PRIMARY KEY,
+    c_name VARCHAR(255),
+    email VARCHAR(255),
+    city VARCHAR(255),
+    pincode VARCHAR(10)
+);
+
+-- Create the 'order' table
+CREATE TABLE order (
+    order_id INT PRIMARY KEY,
+    date DATE,
+    amount DECIMAL(10, 2),
+    cust_id INT,
+    FOREIGN KEY (cust_id) REFERENCES customer(c_id)
+);
+
+
+CREATE INDEX idx_salary ON employee1(salary);
+CREATE INDEX idx_Dept_no ON employee1(Dept_no);
+This code creates the employee table with emp_id as the primary key and adds indices on the salary and Dept_no columns.
+
+b. To create a user-defined index on any column, you can use the CREATE INDEX statement as shown in the previous answer. You can create an index on any column you like by replacing idx_column_name and column_name with your desired index name and column name.
+
+c. To create a sequence using auto-increment, you can use an SQL command like this (syntax may vary depending on the database system you are using):
+
+
+CREATE SEQUENCE order_id_sequence START WITH 1 INCREMENT BY 1;
+This will create a sequence named order_id_sequence that starts at 1 and increments by 1 each time it is used. You can use this sequence to generate auto-incrementing values for a column, such as order_id in the Order table.
+
+d. To truncate a table, you can use the TRUNCATE statement. For example, if you want to truncate the Order table:
+
+
+TRUNCATE TABLE Order1;
+This will remove all rows from the Order table while keeping the table structure intact.
+
+e. To find the list of customers who placed orders and the details of their orders, you can use a SQL query with a JOIN:
+
+
+SELECT c.c_id, c.c_name, o.order_id, o.dates, o.amount
+FROM Customer c
+INNER JOIN Order1 o ON c.c_id = o.cust_id;
+This query will retrieve the customer ID, customer name, order ID, order date, and order amount for customers who have placed orders.
+
+f. To find customer information and append order details to a table, you can use the INSERT INTO ... SELECT statement. Assuming you want to append the order details to a new table:
+
+
+CREATE TABLE CustomerOrderInfo AS
+SELECT c.c_id, c.c_name, o.order_id, o.dates, o.amount
+FROM Customer1 c
+INNER JOIN Order1 o ON c.c_id = o.cust_id;
+This code will create a new table named CustomerOrderInfo and populate it with the customer information and order details.
+
+g. To list down customers who haven't placed an order, you can use a SQL query like this:
+
+
+SELECT c.c_id, c.c_name
+FROM Customer1 c
+LEFT JOIN Order1 o ON c.c_id = o.cust_id
+WHERE o.cust_id IS NULL;
+This query uses a LEFT JOIN to retrieve customers who do not have corresponding orders (where o.cust_id is NULL), indicating that they haven't placed an order.
+
+
+
+
+
+
+
+
