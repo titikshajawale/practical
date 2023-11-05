@@ -1,0 +1,114 @@
+18)create or replace procedure marksproc as
+marks student_marks.total_marks%type;
+stud_name student_marks.name%type:=&name;
+
+BEGIN
+select total_marks into marks from student_marks where stud_name=name;
+
+IF marks<=1500 AND marks>=990
+THEN
+dbms_output.put_line('Category Destinction');
+
+ELSIF marks<989 AND marks>900
+THEN
+dbms_output.put_line('Category First Class');
+
+ELSIF marks<=899 AND marks>=825
+THEN
+dbms_output.put_line('Category Higher Second  Class');
+
+ELSE
+dbms_output.put_line('Student is failed');
+
+
+END IF;
+
+end;
+/
+19)
+create or replace trigger cust_trigg
+after update or delete on customer for each row
+begin 
+if updating then
+insert into cust_audit values(:old.cust_id , :old.addr,'update',sysdate);
+else
+insert into cust_audit values(:old.cust_id , :old.c_name , :old.addr ,'delete',sysdata);
+end if;
+end;
+/
+
+20)
+create or replace trigger client_trigg
+after update or insert on client for each row
+begin 
+if updating then
+insert into client_audit values(:old.c_id , :old.addr,'update',sysdate);
+else
+insert into client_audit values(:old.c_id , :old.c_name , :old.addr ,'insert',sysdata);
+end if;
+end;
+/
+
+
+21)create or replace procedure cursor_proc as
+o_rollno number;
+n_rollno number;
+o_name varchar(90);
+n_name varchar(90);
+
+cursor c1 is select rollno , name from old_rollno;
+cursor c2 is select rollno , name from new_rollno;
+
+
+BEGIN
+open c1;
+open c2;
+
+LOOP
+FETCH c1 into o_rollno ,o_name;
+    Exit  WHEN c1%notfound;
+    
+    BEGIN
+    select rollno into n_rollno from new_rollno where rollno = o_rollno;
+    
+    EXCEPTION
+    when no_data_found then
+    insert into new_rollno (rollno,name) VALUES(o_rollno , o_name);
+    
+    END;
+END LOOP;
+
+close c1;
+close c2;
+
+END;
+/
+22)
+DECLARE
+	i_roll_no NUMBER;
+	name_of_book VARCHAR2(25);
+	no_of_days NUMBER;
+         return_date DATE := TO_DATE(SYSDATE,'DD-MM-YYYY');
+	temp NUMBER;
+	doi DATE;
+	fine NUMBER;
+	BEGIN
+	i_roll_no := &i_roll_no;
+	name_of_book := '&nameofbook';
+	dbms_output.put_line(return_date);
+	SELECT to_date(borrower.dateofissue,'DD-MM-YYYY') INTO doi FROM borrower WHERE
+        borrower.roll_no = i_roll_no AND borrower.name_of_book = name_of_book;
+	no_of_days := return_date-doi;
+	dbms_output.put_line(no_of_days);
+	IF (no_of_days >15 AND no_of_days <=30) THEN
+	fine := 5*no_of_days;
+	ELSIF (no_of_days>30 ) THEN
+	temp := no_of_days-30;
+	fine := 150 + temp*50;
+	END IF;
+	dbms_output.put_line(fine);
+	INSERT INTO fine VALUES(i_roll_no,return_date,fine);
+	UPDATE borrower SET status = 'RETURNED' WHERE borrower.roll_no = i_roll_no;
+	END;
+	/
+
